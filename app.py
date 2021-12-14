@@ -72,5 +72,16 @@ def add_task_to_project(name):
   return jsonify({'message': 'project not found'})
 
 
+@app.route('/project/<string:id>/complete', methods=['POST'])
+def complete_project(id):
+  for project in projects:
+    if project['project_id'] == id:
+      if project['completed'] == "true":
+        return "", 200
+      else:
+        project['completed'] = "true"
+        return jsonify(project)
+
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000, debug=True)
