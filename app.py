@@ -5,7 +5,7 @@ import pickle
 app = Flask(__name__)
 
 with open("projects.pickle", "rb") as file:
-  projects = pickle.load(file)
+  projects = pickle.load(file)["projects"]
 
 
 @app.route('/')
@@ -19,10 +19,10 @@ def get_projects():
   return jsonify({'projects': projects})
 
 
-@app.route('/project/<string:name>')
-def get_project(name):
+@app.route('/project/<string:id>')
+def get_project(id):
   for project in projects:
-    if project['name'] == name:
+    if project['project_id'] == id:
       return jsonify(project)
   return jsonify({'message': 'project not found'})
 
