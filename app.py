@@ -14,6 +14,17 @@ def save_data(data):
     pickle.dump(data, file)
 
 
+def filter_list_of_dicts(list_of_dicts, fields):
+  filtered_dicts = []
+  for dict in list_of_dicts:
+    my_dict = dict.copy()
+    for key in dict:
+      if key not in fields:
+        my_dict.pop(key, None)
+    filtered_dicts.append(my_dict)
+  return filtered_dicts
+
+
 @app.route('/')
 def home():
   name = "Zsolt"
@@ -22,7 +33,12 @@ def home():
 
 @app.route('/project')
 def get_projects():
-  return jsonify({'projects': projects})
+  try:
+    request_data = request.get_json()
+    return jsonify(
+        {'projects': filter_list_of_dicts(projects, request_data['fields'])})
+  except:
+    return jsonify({'projects': projects})
 
 
 @app.route('/project/<string:id>')
@@ -33,11 +49,18 @@ def get_project(id):
   return jsonify({'message': 'project not found'})
 
 
-@app.route('/project/<string:name>/task')
-def get_all_tasks_in_project(name):
+@app.route('/project/<string:id>/task')
+def get_all_tasks_in_project(id):
   for project in projects:
-    if project['name'] == name:
-      return jsonify({'tasks': project['tasks']})
+    if project['project_id'] == id:
+      try:
+        request_data = request.get_json()
+        return jsonify({
+            'tasks':
+            filter_list_of_dicts(project['tasks'], request_data['fields'])
+        })
+      except:
+        return jsonify({'tasks': project['tasks']})
   return jsonify({'message': 'project not found'})
 
 
